@@ -1,17 +1,13 @@
 package app
 
-import java.awt.event.{ActionEvent, ActionListener}
 import java.io._
 import java.util.Date
-import java.util.concurrent.ConcurrentLinkedQueue
-import javax.swing._
 
 import org.jsoup.Jsoup
 import org.jsoup.examples.HtmlToPlainText
 import org.jsoup.nodes.Document
 import scala.collection.JavaConversions._
 
-import scala.collection.Iterator
 
 /**
  * LSC Main Application

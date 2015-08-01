@@ -3,6 +3,7 @@ package app
 import java.io._
 import java.util.Date
 
+import org.apache.commons.cli.{HelpFormatter, Options, DefaultParser, CommandLineParser}
 import org.jsoup.Jsoup
 import org.jsoup.examples.HtmlToPlainText
 import org.jsoup.nodes.Document
@@ -13,8 +14,6 @@ import scala.collection.JavaConversions._
  * LSC Main Application
  */
 object LSC extends App {
-  System.setProperty("socksProxyHost", "127.0.0.1")
-  System.setProperty("socksProxyPort", "8081")
 
 
   val hpt = new HtmlToPlainText()
@@ -62,27 +61,34 @@ object LSC extends App {
     }
   }
 
-  private def printUsage(): Unit = {
-    println(
-    """
-       Usage:
-          java -jar LSC-assembly-1.0.jar [--author] URL
-    """.stripMargin
-    )
-  }
+  val cli: CommandLineParser = new DefaultParser()
+  val cliOptions: Options = new Options()
+  val formatter = new HelpFormatter()
+  cliOptions.addOption("a", "author", true, "grab author")
+  cliOptions.addOption("s", "story", true, "grab story")
+  cliOptions.addOption("p", "port", true, "port to connect to")
 
-  // Main
+  //Main
   try {
-    val arg0 = args(0)
-    if (arg0 == "--author") {
-      readAllAuthor(args(1))
+
+    val parsed = cli.parse(cliOptions, args)
+
+    System.setProperty("socksProxyHost", "127.0.0.1")
+    System.setProperty("socksProxyPort",
+      Option(parsed.getOptionValue("p")).getOrElse("8081")
+    )
+
+    if (parsed.hasOption("a")) {
+      readAllAuthor(parsed.getOptionValue("a"))
       println("Downloaded author")
-    } else {
-      download(arg0)
+    } else if (parsed.hasOption("s")){
+      download(parsed.getOptionValue("s"))
       println("Downloaded story")
+    } else {
+      formatter.printHelp( "LSC", cliOptions );
     }
   } catch {
     case e: IndexOutOfBoundsException =>
-      printUsage()
+      formatter.printHelp( "LSC", cliOptions );
   }
 }

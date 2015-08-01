@@ -53,6 +53,10 @@ object LSC extends App {
   private def readAllAuthor(link: String): Unit = {
     try {
       val doc: Document = Jsoup.connect(link).get()
+      val name: String = doc.select("a.contactheader").text()
+      println(s"Grabbing stories for $name")
+      val urls = doc.select("tr.sl td a.bb").iterator().toList
+      println(s"${urls.length} stories found")
       urls.foreach{x=>download(x.attr("href"))}
     } catch {
       case e: IOException =>

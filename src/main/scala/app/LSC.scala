@@ -18,6 +18,8 @@ object LSC extends App {
 
   val hpt = new HtmlToPlainText()
 
+  private var outputDir: String = ""
+
   private def body(doc: Document, writer: BufferedWriter): Unit = {
     val cont = hpt.getPlainText(doc.select("div.b-story-body-x.x-r15").first())
     writer.write(cont)
@@ -34,7 +36,8 @@ object LSC extends App {
       val doc: Document = Jsoup.connect(link).get()
       val title = doc.select("div.b-story-header h1").text()
       val author = doc.select("span.b-story-user-y.x-r22 a").text()
-      val name = (author + "_" + title).replaceAll("\\s", "_") + ".txt"
+      val name = s"$outputDir${if (!outputDir.endsWith("/")) "/"}" +
+        (author + "_" + title).replaceAll("\\s", "_") + ".txt"
 
       val writer = new BufferedWriter(new FileWriter(new File(name)))
 
@@ -70,6 +73,7 @@ object LSC extends App {
   cliOptions.addOption("a", "author", true, "grab author")
   cliOptions.addOption("s", "story", true, "grab story")
   cliOptions.addOption("p", "port", true, "port to connect to")
+  cliOptions.addOption("o", "out", true, "output directory")
 
   //Main
   try {
@@ -80,6 +84,10 @@ object LSC extends App {
     System.setProperty("socksProxyPort",
       Option(parsed.getOptionValue("p")).getOrElse("8081")
     )
+
+    if (parsed.hasOption("o")) {
+      outputDir = parsed.getOptionValue("o")
+    }
 
     if (parsed.hasOption("a")) {
       readAllAuthor(parsed.getOptionValue("a"))

@@ -38,7 +38,7 @@ object LSC extends App {
 
       val writer = new BufferedWriter(new FileWriter(new File(name)))
 
-      writer.write(s"$title by $author\n\n")
+      writer.write(s"$title by $author\n ($link)\n\n")
       body(doc, writer)
       writer.write(s"\n\n############\nFetched on ${new Date().toString}")
       writer.flush()

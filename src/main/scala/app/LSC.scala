@@ -104,6 +104,10 @@ object LSC extends App {
       outputDir = parsed.getOptionValue("o")
     }
 
+    if (parsed.hasOption("v")) {
+      verbose = true
+    }
+
     if (parsed.hasOption("a")) {
       readAllAuthor(parsed.getOptionValue("a"))
       println("Downloaded author")

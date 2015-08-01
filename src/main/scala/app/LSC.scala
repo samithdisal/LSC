@@ -20,6 +20,14 @@ object LSC extends App {
 
   private var outputDir: String = ""
 
+  private var verbose: Boolean = false
+
+  private def log(msg: String): Unit = {
+    if(verbose) {
+      println(msg)
+    }
+  }
+
   private def body(doc: Document, writer: BufferedWriter): Unit = {
     val cont = hpt.getPlainText(doc.select("div.b-story-body-x.x-r15").first())
     writer.write(cont)
@@ -28,16 +36,22 @@ object LSC extends App {
     val next = doc.select("a.b-pager-next")
     if (!next.isEmpty) {
       body(Jsoup.connect(next.first().attr("href")).get(), writer)
+      log("Fetching next page")
     }
   }
 
   private def download(link: String): Unit = {
     try {
+      println(s"Grabbing story $link")
       val doc: Document = Jsoup.connect(link).get()
       val title = doc.select("div.b-story-header h1").text()
+      log(s"Title: $title")
       val author = doc.select("span.b-story-user-y.x-r22 a").text()
+      log(s"Author: $author")
       val name = s"$outputDir${if (!outputDir.endsWith("/")) "/"}" +
         (author + "_" + title).replaceAll("\\s", "_") + ".txt"
+
+      log(s"File: $name")
 
       val writer = new BufferedWriter(new FileWriter(new File(name)))
 
@@ -74,6 +88,7 @@ object LSC extends App {
   cliOptions.addOption("s", "story", true, "grab story")
   cliOptions.addOption("p", "port", true, "port to connect to")
   cliOptions.addOption("o", "out", true, "output directory")
+  cliOptions.addOption("v", "verbose", false, "make verbose")
 
   //Main
   try {
